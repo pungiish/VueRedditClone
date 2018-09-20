@@ -1,0 +1,18 @@
+{
+	"include": [
+		"./src/**/*"
+	],
+	"compilerOptions": {
+		"module": "esNext",
+		"moduleResolution": "node",
+		"target": "es5",
+		"sourceMap": true,
+		"allowJs": true,
+		"lib": [
+			"es5",
+			"es7",
+			"dom"
+		],
+		"experimentalDecorators": true
+	}
+}
