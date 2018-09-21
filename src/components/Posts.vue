@@ -3,7 +3,7 @@
         <form @submit.prevent="search">
             <div class="form-group">
                 <label for="subreddit">
-                    <h2>Search for a subreddit</h2>
+                    <h2>Search for a subreddit!</h2>
                 </label>
                 <input id="subreddit" v-model="subreddit" type="text" class="form-control" aria-describedby="subreddit" placeholder="Enter subreddit" style="width: 50%; margin: 0 auto;">
             </div>
