@@ -6,7 +6,7 @@ module.exports = {
     extends: ['plugin:vue/recommended', '@vue/airbnb', '@vue/typescript'],
     plugins: [
         'prettier',
-        'vue'
+        'vue',
     ],
     rules: {
         'vue/html-indent': ['error', 4],

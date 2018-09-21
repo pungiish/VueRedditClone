@@ -5,28 +5,47 @@
                 <label for="subreddit">
                     <h2>Search for a subreddit!</h2>
                 </label>
-                <input id="subreddit" v-model="subreddit" type="text" class="form-control" aria-describedby="subreddit" placeholder="Enter subreddit" style="width: 50%; margin: 0 auto;">
+                <input id="subreddit" :value="subreddit" type="text" class="form-control" aria-describedby="subreddit" placeholder="Enter subreddit" style="width: 50%; margin: 0 auto;" @input="updateValue($event)">
             </div>
         </form>
-        <div v-for="(item, index) in posts" :key="index" class="card" style="width: 70%; margin: 0 auto;">
-            <div class="card-body card text-white  mb-3" style="width:100%;margin: 0 !important;">
-                <h6 class="card-subtitle mb-2 text-muted" style="margin: 0 auto;">Author: {{item.data.author}}</h6>
-                <a :href="'http://www.reddit.com/r/' + item.data.subreddit + '/comments/' + item.data.id + '/' + item.data.title" class="card-title" style="display:inline-block;margin: 0 auto;"> {{item.data.title}}</a>
-                <p class="card-text">{{item.data.selftext}}</p>
-                <div v-if="item.data.preview" style="margin: 0 auto;">
-                    <img :src="item.data.preview.images[0].source.url" style="height: 400px; width:100%;margin-bottom: 10px;" alt="Card image">
-                </div>
-                <button class="btn btn-info" style="width:200px; margin: 0 auto;" @click="getComments(index)">get comments</button>
-                <div v-if="!commentsNotWorking">
-                    <div class="list-group" style="margin-top: 10px;">
-                        <a v-for=" (comment, idx) in comments[index] " :key="idx " class="list-group-item list-group-item-action card text-white bg-primary mb-3 ">
-                            {{comment.data.body}} - [{{comment.data.author}}]
-                        </a>
+        <div v-for="(item, index) in posts " :key="index " class="media border-top border-right border-left border-info p-3 ">
+            <img :src="item.data.thumbnail " class="d-inline-block border " style="height:80px;width:90px " alt="No thumbnail available! ">
+            <div class="media-body text-info ">
+                <div class="row ">
+                    <div class="col-sm-12 ">
+                        <a :href=" 'https://www.reddit.com/user/' + item.data.author " class="float-left ml-3 d-block ">[{{item.data.author}}]</a>
+                    </div>
+                    <div class="col-sm-12 ">
+                        <div v-if="item.data.title.length<140 ">
+                            <a :href=" 'https://www.reddit.com/' + item.data.permalink " class="float-left ml-3 d-block ">
+                                {{item.data.title}}
+                                <span class="badge badge-default text-warning ">New</span>
+                            </a>
+                        </div>
+                        <div v-else>
+                            <a :href=" 'https://www.reddit.com/' + item.data.permalink " class="float-left ml-3 d-block ">{{ item.data.title.substring(0,140) + '..'}}</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 ">
+                        <div v-if="item.data.selftext.length<50 ">
+                            <p class="float-left ml-3 d-block ">{{ item.data.selftext }}</p>
+                        </div>
+                        <div v-else>
+                            <p class="float-left ml-3 d-block ">{{ item.data.selftext.substring(0,50) + '..'}}</p>
+                        </div>
                     </div>
                 </div>
-                <div v-else>No comments</div>
             </div>
         </div>
+        <!--  <button class="btn btn-info " style="width:200px; margin: 0 auto; " @click="getComments(index) ">get comments</button>
+        <div v-if="!commentsNotWorking ">
+            <div class="list-group " style="margin-top: 10px; ">
+                <a v-for=" (comment, idx) in comments[index] " :key="idx " class="list-group-item list-group-item-action card text-white bg-primary mb-3 ">
+                    {{comment.data.body}} - [{{comment.data.author}}]
+                </a>
+            </div>
+        </div>
+        <div v-else>No comments</div -->>
     </div>
 </template>
 <script lang="ts">
@@ -42,6 +61,7 @@ export default class Posts extends Vue {
 	mounted() {
 		this.load(`${this.url}${this.subreddit}/`);
 	}
+
 	load(url?: string): Promise<any> {
 		return fetch(`${url}.json`, {})
 			.then(res => {
@@ -119,7 +139,10 @@ export default class Posts extends Vue {
 	search() {
 		this.posts = [];
 		this.load(`${this.url}${this.subreddit}/`);
-		this.$forceUpdate();
+	}
+	updateValue($event) {
+		this.subreddit = $event.target.value;
+		console.log(this.subreddit);
 	}
 }
 </script>
