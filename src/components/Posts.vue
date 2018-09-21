@@ -7,32 +7,48 @@
                 </label>
                 <input id="subreddit" :value="subreddit" type="text" class="form-control" aria-describedby="subreddit" placeholder="Enter subreddit" style="width: 50%; margin: 0 auto;" @input="updateValue($event)">
             </div>
+            <div class="form-group">
+                <select id="exampleFormControlSelect2" v-model="query" class="form-control" style="width: 50%; margin: 0 auto;">
+                    <option value="new">new</option>
+                    <option value="top">top</option>
+                    <option value="hot">hot</option>
+                    <option value="rising">rising</option>
+                </select>
+            </div>
         </form>
         <div v-for="(item, index) in posts " :key="index " class="media border-top border-right border-left border-info p-3 ">
             <img :src="item.data.thumbnail " class="d-inline-block border " style="height:80px;width:90px " alt="No thumbnail available! ">
             <div class="media-body text-info ">
                 <div class="row ">
                     <div class="col-sm-12 ">
-                        <a :href=" 'https://www.reddit.com/user/' + item.data.author " class="float-left ml-3 d-block ">[{{item.data.author}}]</a>
-                    </div>
-                    <div class="col-sm-12 ">
-                        <div v-if="item.data.title.length<140 ">
+                        <div v-if="item.data.title.length<50 ">
                             <a :href=" 'https://www.reddit.com/' + item.data.permalink " class="float-left ml-3 d-block ">
                                 {{item.data.title}}
-                                <span class="badge badge-default text-warning ">New</span>
+                                <span v-if="computedTime(index) <= 4" class="badge badge-default text-warning ">New</span>
                             </a>
                         </div>
                         <div v-else>
-                            <a :href=" 'https://www.reddit.com/' + item.data.permalink " class="float-left ml-3 d-block ">{{ item.data.title.substring(0,140) + '..'}}</a>
+                            <a :href=" 'https://www.reddit.com/' + item.data.permalink " class="float-left ml-3 d-block ">{{ item.data.title.substring(0,50) + '..'}}</a>
+                            <span v-if="computedTime(index) <= 4" class="badge badge-default text-warning float-left">New</span>
                         </div>
                     </div>
                     <div class="col-sm-12 ">
                         <div v-if="item.data.selftext.length<50 ">
                             <p class="float-left ml-3 d-block ">{{ item.data.selftext }}</p>
+                            <p class="float-left inline mb-1">{{computedTime(index)}} hours ago by
+                                <a :href=" 'https://www.reddit.com/user/' + item.data.author " class=" inline">[{{item.data.author}}]</a>
+                            </p>
                         </div>
                         <div v-else>
                             <p class="float-left ml-3 d-block ">{{ item.data.selftext.substring(0,50) + '..'}}</p>
+                            <p class="float-left inline mb-1">{{computedTime(index)}} hours ago by
+                                <a :href=" 'https://www.reddit.com/user/' + item.data.author " class=" inline">[{{item.data.author}}]</a>
+                            </p>
                         </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <p class="ml-3 float-left text-white">
+                        <font-awesome-icon icon="thumbs-up" /> {{item.data.ups}}</p>
                     </div>
                 </div>
             </div>
@@ -56,10 +72,17 @@ export default class Posts extends Vue {
 	commentsNotWorking = false;
 	subreddit = 'pics';
 	url = 'https://www.reddit.com/r/';
+	query = 'new';
 	posts = [];
 	comments = [];
+	@Watch('query')
+	queryChanged(selectedQuery: string, old: string) {
+		this.query = selectedQuery;
+		this.search();
+	}
+
 	mounted() {
-		this.load(`${this.url}${this.subreddit}/`);
+		this.load(`${this.url}${this.subreddit}/${this.query}/`);
 	}
 
 	load(url?: string): Promise<any> {
@@ -138,11 +161,25 @@ export default class Posts extends Vue {
 	}
 	search() {
 		this.posts = [];
-		this.load(`${this.url}${this.subreddit}/`);
+		this.load(`${this.url}${this.subreddit}/${this.query}/`);
 	}
 	updateValue($event) {
 		this.subreddit = $event.target.value;
 		console.log(this.subreddit);
+	}
+	computedTime(idx) {
+		const d = new Date(this.posts[idx].data.created_utc * 1000);
+
+		const now = new Date();
+		// Get 1 hour in milliseconds
+		const hours = 1000 * 60 * 60;
+		// Convert both dates to milliseconds
+		const date1Ms = d.getTime();
+		const date2Ms = now.getTime();
+		// Calculate the difference in milliseconds
+		const differenceMs = date2Ms - date1Ms;
+		// Convert back to hours and return
+		return Math.round(differenceMs / hours);
 	}
 }
 </script>
