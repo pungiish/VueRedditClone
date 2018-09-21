@@ -20,7 +20,7 @@
                 <div v-if="!commentsNotWorking">
                     <div class="list-group" style="margin-top: 10px;">
                         <a v-for=" (comment, idx) in comments[index] " :key="idx " class="list-group-item list-group-item-action card text-white bg-primary mb-3 ">
-                            {{comment.data.body}}
+                            {{comment.data.body}} - [{{comment.data.author}}]
                         </a>
                     </div>
                 </div>
